@@ -1,0 +1,27 @@
+@import "tailwindcss";
+/* <CHANGE> Removed broken tw-animate-css import causing CSS parsing error */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ... existing code ... */
+}
+
+.dark {
+  /* ... existing code ... */
+}
+
+@theme inline {
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  /* ... existing code ... */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
