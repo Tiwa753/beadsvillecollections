@@ -1,6 +1,6 @@
 "use client"
 
-import { Star } from "lucide-react"
+import { Star, Instagram, Paintbrush as Pinterest } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -326,12 +326,24 @@ export default function Home() {
               <h4 className="font-semibold mb-4 text-sm">Follow</h4>
               <ul className="text-sm text-muted-foreground space-y-2">
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <a
+                    href="https://www.instagram.com/beadsville_beaditt/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors flex items-center gap-2"
+                  >
+                    <Instagram size={16} />
                     Instagram
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <a
+                    href="https://in.pinterest.com/BEADSVILLE/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors flex items-center gap-2"
+                  >
+                    <Pinterest size={16} />
                     Pinterest
                   </a>
                 </li>
