@@ -9,66 +9,83 @@ export default function CollectionPage() {
   const allProducts = [
     {
       id: 1,
-      name: "Vintage Pearl Bracelet",
-      category: "bracelets",
-      image: "/vintage-pearl-bracelet.jpg",
-      price: "$42.99",
+      name: "Ruby Heart Necklace",
+      category: "necklaces",
+      image: "/images/img-20251210-wa0015.jpg",
+      price: "$45.99",
+      description:
+        "Romantic silver chain necklace featuring a striking red heart pendant with golden spikes and delicate star charm.",
     },
     {
       id: 2,
-      name: "Delicate Chain Necklace",
+      name: "Garden Bloom Necklace",
       category: "necklaces",
-      image: "/delicate-chain-necklace.jpg",
-      price: "$35.50",
+      image: "/images/img-20251210-wa0021.jpg",
+      price: "$42.50",
+      description:
+        "Vibrant gold chain necklace with mixed gemstone beads in yellow, navy, and green tones, topped with a charming green flower pendant.",
     },
     {
       id: 3,
-      name: "Statement Beaded Earrings",
-      category: "earrings",
-      image: "/statement-beaded-earrings.jpg",
-      price: "$28.99",
+      name: "Celestial Dreams Necklace",
+      category: "necklaces",
+      image: "/images/img-20251210-wa0025.jpg",
+      price: "$48.99",
+      description:
+        "Ethereal gold chain necklace with colorful enamel charms featuring dreamy celestial designs in coral, pink, and turquoise.",
     },
     {
       id: 4,
-      name: "Charm Link Bracelet",
-      category: "bracelets",
-      image: "/charm-link-bracelet.jpg",
-      price: "$48.75",
+      name: "Tiger's Eye Protection Necklace",
+      category: "necklaces",
+      image: "/images/img-20251210-wa0028.jpg",
+      price: "$52.75",
+      description:
+        "Bold black beaded necklace with gold accents and natural tiger's eye stone pendant, perfect for grounding energy.",
     },
     {
       id: 5,
-      name: "Minimalist Gold Chain",
+      name: "Sunshine Harmony Necklace",
       category: "necklaces",
-      image: "/minimalist-gold-chain.jpg",
-      price: "$39.99",
+      image: "/images/img-20251210-wa0027.jpg",
+      price: "$44.25",
+      description:
+        "Cheerful gold chain necklace with yellow, navy, and clear crystal beads plus dual green flower accents for an optimistic touch.",
     },
     {
       id: 6,
-      name: "Pearl Drop Earrings",
-      category: "earrings",
-      image: "/pearl-drop-earrings.jpg",
-      price: "$32.50",
+      name: "Sacred Soul Necklace",
+      category: "necklaces",
+      image: "/images/img-20251210-wa0018.jpg",
+      price: "$50.50",
+      description:
+        "Spiritual black and silver necklace featuring cross charms, hematite beads, and gothic metal accents with a protective aura.",
     },
     {
       id: 7,
-      name: "Beaded Stretch Bracelet",
-      category: "bracelets",
-      image: "/beaded-stretch-bracelet.jpg",
-      price: "$45.00",
+      name: "Modern Cross Necklace",
+      category: "necklaces",
+      image: "/images/img-20251210-wa0024.jpg",
+      price: "$46.99",
+      description:
+        "Contemporary silver chain with intricate cross details, hematite spacers, and crystal accents for a sophisticated spiritual statement.",
     },
     {
       id: 8,
-      name: "Layered Chain Necklace",
+      name: "Golden Medallion Necklace",
       category: "necklaces",
-      image: "/layered-chain-necklace.jpg",
-      price: "$52.99",
+      image: "/images/img-20251210-wa0020.jpg",
+      price: "$49.75",
+      description:
+        "Elegant gold chain necklace with yellow jasper and clear crystal beads, finished with a timeless gold coin medallion pendant.",
     },
     {
       id: 9,
-      name: "Vintage Hoop Earrings",
+      name: "Pearl Drop Earrings",
       category: "earrings",
-      image: "/vintage-hoop-earrings.jpg",
-      price: "$36.75",
+      image: "/pearl-drop-earrings.png",
+      price: "$32.50",
+      description: "Classic pearl drop earrings with delicate silver findings.",
     },
     {
       id: 10,
@@ -76,13 +93,15 @@ export default function CollectionPage() {
       category: "bracelets",
       image: "/boho-beaded-bracelet.jpg",
       price: "$40.25",
+      description: "Colorful beaded bracelet with vintage charm.",
     },
     {
       id: 11,
       name: "Silver Pendant Necklace",
       category: "necklaces",
-      image: "/silver-pendant-necklace.jpg",
+      image: "/silver-pendant.jpg",
       price: "$44.50",
+      description: "Minimalist silver necklace with small pendant.",
     },
     {
       id: 12,
@@ -90,6 +109,7 @@ export default function CollectionPage() {
       category: "earrings",
       image: "/chandelier-earrings.jpg",
       price: "$41.99",
+      description: "Statement chandelier earrings with intricate details.",
     },
   ]
 
@@ -103,10 +123,7 @@ export default function CollectionPage() {
           <div className="flex justify-between items-center h-20">
             <Link href="/">
               <div className="flex-shrink-0 cursor-pointer">
-                <h1 className="text-3xl font-bold tracking-wider" style={{ fontFamily: "var(--font-serif)" }}>
-                  BEADSVILLE
-                </h1>
-                <p className="text-xs text-muted-foreground tracking-widest mt-1">Handcrafted Jewelry</p>
+                <img src="/beadsville-logo.jpg" alt="BEADSVILLE - Your Lucky Charm" className="h-16 w-auto" />
               </div>
             </Link>
 
@@ -203,6 +220,7 @@ export default function CollectionPage() {
               <h3 className="text-lg font-semibold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
                 {product.name}
               </h3>
+              <p className="text-muted-foreground mb-2">{product.description}</p>
               <div className="flex justify-between items-center">
                 <p className="text-muted-foreground">{product.price}</p>
                 <button className="text-sm underline hover:text-primary transition-colors">Add to Cart</button>

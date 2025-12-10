@@ -68,10 +68,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex-shrink-0">
-              <h1 className="text-3xl font-bold tracking-wider" style={{ fontFamily: "var(--font-serif)" }}>
-                BEADSVILLE
-              </h1>
-              <p className="text-xs text-muted-foreground tracking-widest mt-1">Handcrafted Jewelry</p>
+              <img src="/beadsville-logo.jpg" alt="BEADSVILLE - Your Lucky Charm" className="h-16 w-auto" />
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
