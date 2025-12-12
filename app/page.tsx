@@ -313,6 +313,12 @@ export default function Home() {
                     Earrings
                   </Link>
                 </li>
+                <li>
+                  <Link href="/collection"
+                  className="hover:text-foreground transition-colors">
+                    Phone Charms
+                  </Link>
+                </li> 
               </ul>
             </div>
             <div>
@@ -329,7 +335,7 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <a href="beadsville569@gmail.com" className="hover:text-foreground transition-colors">
                     Email
                   </a>
                 </li>

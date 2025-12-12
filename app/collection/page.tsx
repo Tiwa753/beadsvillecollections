@@ -12,6 +12,7 @@ export default function CollectionPage() {
     type: "necklace",
     description: "",
     images: [],
+    imageFiles: [], // Store actual File objects to send via WhatsApp
   })
 
   const allProducts = [
@@ -105,6 +106,96 @@ export default function CollectionPage() {
       originalPrice: 58.44,
       description: "Edgy silver barbed wire chain with black heart sunburst pendant.",
     },
+    {
+      id: 13,
+      name: "Smiley Sunshine Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0064.jpg",
+      price: 15.99,
+      originalPrice: 19.99,
+      description: "Cheerful yellow and black smiley face beaded phone charm.",
+    },
+    {
+      id: 14,
+      name: "Pink Candy Dream Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0053.jpg",
+      price: 16.5,
+      originalPrice: 20.63,
+      description: "Sweet pink and white phone charm with candy and flower shaped beads.",
+    },
+    {
+      id: 15,
+      name: "Pastel Stars Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0052.jpg",
+      price: 17.25,
+      originalPrice: 21.56,
+      description: "Dreamy blue and pink pastel phone charm with flower and star beads.",
+    },
+    {
+      id: 16,
+      name: "Pearl Heart Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0021.jpg",
+      price: 18.99,
+      originalPrice: 23.74,
+      description: "Elegant pink and white pearl phone charm with heart pendant.",
+    },
+    {
+      id: 17,
+      name: "Garden Party Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0060.jpg",
+      price: 16.75,
+      originalPrice: 20.94,
+      description: "Vibrant yellow and green phone charm with stars and flowers.",
+    },
+    {
+      id: 18,
+      name: "Citrus Pop Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0065.jpg",
+      price: 17.5,
+      originalPrice: 21.88,
+      description: "Bright yellow and pastel multicolor phone charm with stars.",
+    },
+    {
+      id: 19,
+      name: "Lavender Blossom Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0054.jpg",
+      price: 18.25,
+      originalPrice: 22.81,
+      description: "Elegant purple, black and pink phone charm with flowers.",
+    },
+    {
+      id: 20,
+      name: "Starlight Dreams Charm",
+      category: "phone-charms",
+      image: "/images/img-20251212-wa0059.jpg",
+      price: 17.99,
+      originalPrice: 22.49,
+      description: "Whimsical purple and yellow phone charm with stars and flowers.",
+    },
+    {
+      id: 21,
+      name: "Pink Heart Bracelet Set",
+      category: "bracelets",
+      image: "/images/img-20251212-wa0022.jpg",
+      price: 34.99,
+      originalPrice: 43.74,
+      description: "Adorable pink heart-themed bracelet set with heart charms (2 pieces).",
+    },
+    {
+      id: 22,
+      name: "Amber Stone Bracelet Duo",
+      category: "bracelets",
+      image: "/images/img-20251212-wa0049.jpg",
+      price: 39.5,
+      originalPrice: 49.38,
+      description: "Natural yellow amber stone bracelets with silver accents (2 pieces).",
+    },
   ]
 
   const filteredProducts = filter === "all" ? allProducts : allProducts.filter((p) => p.category === filter)
@@ -139,13 +230,18 @@ export default function CollectionPage() {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files)
     const imageUrls = files.map((file) => URL.createObjectURL(file))
-    setCustomOrder({ ...customOrder, images: [...customOrder.images, ...imageUrls] })
+    setCustomOrder({
+      ...customOrder,
+      images: [...customOrder.images, ...imageUrls],
+      imageFiles: [...customOrder.imageFiles, ...files],
+    })
   }
 
   const removeImage = (indexToRemove) => {
     setCustomOrder({
       ...customOrder,
       images: customOrder.images.filter((_, index) => index !== indexToRemove),
+      imageFiles: customOrder.imageFiles.filter((_, index) => index !== indexToRemove),
     })
   }
 
@@ -154,9 +250,13 @@ export default function CollectionPage() {
       alert("Please describe your custom order")
       return
     }
-    const message = `Hi! I'd like to place a custom order:%0A%0AType: ${customOrder.type.charAt(0).toUpperCase() + customOrder.type.slice(1)}%0ADescription: ${customOrder.description}%0A%0A${customOrder.images.length > 0 ? `I have ${customOrder.images.length} reference image(s) to share.` : ""}`
+    const imageNote =
+      customOrder.images.length > 0
+        ? `%0A%0AI have ${customOrder.images.length} reference image(s) to share. I'll send them in the next message.`
+        : ""
+    const message = `Hi! I'd like to place a custom order:%0A%0AType: ${customOrder.type.charAt(0).toUpperCase() + customOrder.type.slice(1)}%0ADescription: ${customOrder.description}${imageNote}`
     window.open(`https://wa.me/2349067480528?text=${message}`, "_blank")
-    setCustomOrder({ type: "necklace", description: "", images: [] })
+    setCustomOrder({ type: "necklace", description: "", images: [], imageFiles: [] })
   }
 
   return (
@@ -174,7 +274,11 @@ export default function CollectionPage() {
           <div className="flex justify-between items-center h-24">
             <Link href="/">
               <div className="flex-shrink-0 cursor-pointer">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/beadsville%20logo%202-AVVceonxZQf3bh1N0tn1UnL0Sb63oD.png" alt="BEADSVILLE - Your Lucky Charm" className="h-20 w-auto" />
+                <img
+                  src="/images/beadsville-20logo-202.png"
+                  alt="BEADSVILLE - Your Lucky Charm"
+                  className="h-20 w-auto"
+                />
               </div>
             </Link>
 
@@ -210,8 +314,8 @@ export default function CollectionPage() {
             Explore All Pieces
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Our complete range of handcrafted bracelets, necklaces, and earrings—each meticulously designed with premium
-            beads and delicate chains.
+            Our complete range of handcrafted bracelets, necklaces, phone charms, and earrings—each meticulously
+            designed with premium beads and delicate chains.
           </p>
         </div>
       </section>
@@ -238,6 +342,26 @@ export default function CollectionPage() {
             }`}
           >
             Necklaces
+          </button>
+          <button
+            onClick={() => setFilter("phone-charms")}
+            className={`px-6 py-2 border-2 transition-all ${
+              filter === "phone-charms"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-foreground hover:border-primary"
+            }`}
+          >
+            Phone Charms
+          </button>
+          <button
+            onClick={() => setFilter("bracelets")}
+            className={`px-6 py-2 border-2 transition-all ${
+              filter === "bracelets"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-foreground hover:border-primary"
+            }`}
+          >
+            Bracelets
           </button>
         </div>
       </section>
@@ -289,8 +413,8 @@ export default function CollectionPage() {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold mb-3">Choose Type</label>
-              <div className="grid grid-cols-3 gap-4">
-                {["necklace", "earrings", "bracelet"].map((type) => (
+              <div className="grid grid-cols-4 gap-4">
+                {["necklace", "earrings", "bracelet", "phone-charm"].map((type) => (
                   <button
                     key={type}
                     onClick={() => setCustomOrder({ ...customOrder, type })}
@@ -300,7 +424,11 @@ export default function CollectionPage() {
                         : "border-border hover:border-primary"
                     }`}
                   >
-                    {type === "earrings" ? "Earrings" : type.charAt(0).toUpperCase() + type.slice(1)}
+                    {type === "phone-charm"
+                      ? "Phone Charm"
+                      : type === "earrings"
+                        ? "Earrings"
+                        : type.charAt(0).toUpperCase() + type.slice(1)}
                   </button>
                 ))}
               </div>
@@ -437,7 +565,7 @@ export default function CollectionPage() {
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Earrings
+                    Phone Charms
                   </a>
                 </li>
               </ul>
@@ -486,7 +614,7 @@ export default function CollectionPage() {
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 BEADSVILLE - Your Lucky Charm. Made in Nigeria with love.</p>
+            <p>&copy; 2025 BEADSVILLE - Your Lucky Charm</p>
           </div>
         </div>
       </footer>
