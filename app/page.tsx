@@ -1,6 +1,6 @@
 "use client"
 
-import { Star, Instagram, Paintbrush as Pinterest, ShoppingCart } from "lucide-react"
+import { Star, Instagram, Paintbrush as Pinterest, ShoppingCart, X } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -65,6 +65,17 @@ export default function Home() {
     setCart([...cart, product])
   }
 
+  const removeFromCart = (indexToRemove) => {
+    setCart(cart.filter((_, index) => index !== indexToRemove))
+  }
+
+  const scrollToCart = () => {
+    const cartSection = document.getElementById("cart-summary")
+    if (cartSection) {
+      cartSection.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+  }
+
   const handleCheckout = () => {
     if (cart.length === 0) return
     const cartSummary = cart.map((p) => `${p.name} - ₦${(p.price * 450).toFixed(0)}`).join("%0A")
@@ -95,8 +106,8 @@ export default function Home() {
               <a href="#about" className="text-sm hover:text-muted-foreground transition-colors">
                 About
               </a>
-              <div className="relative">
-                <ShoppingCart size={20} className="cursor-pointer" />
+              <div className="relative cursor-pointer" onClick={scrollToCart}>
+                <ShoppingCart size={20} />
                 {cart.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     {cart.length}
@@ -220,7 +231,7 @@ export default function Home() {
       </section>
 
       {cart.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section id="cart-summary" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-muted p-8 rounded-lg">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-serif)" }}>
@@ -228,11 +239,21 @@ export default function Home() {
               </h3>
               <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}</p>
             </div>
-            <div className="mb-6 space-y-2">
+            <div className="mb-6 space-y-3">
               {cart.map((item, idx) => (
-                <p key={idx} className="text-sm text-muted-foreground">
-                  {item.name} - ₦{(item.price * 450).toFixed(0)}
-                </p>
+                <div key={idx} className="flex items-center justify-between bg-background p-3 rounded">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{item.name}</p>
+                    <p className="text-sm text-muted-foreground">₦{(item.price * 450).toFixed(0)}</p>
+                  </div>
+                  <button
+                    onClick={() => removeFromCart(idx)}
+                    className="ml-4 p-1 hover:bg-muted rounded-full transition-colors"
+                    aria-label="Remove item"
+                  >
+                    <X size={18} className="text-muted-foreground hover:text-destructive" />
+                  </button>
+                </div>
               ))}
             </div>
             <button
