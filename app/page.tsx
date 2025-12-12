@@ -1,36 +1,36 @@
 "use client"
 
-import { Star, Instagram, Paintbrush as Pinterest } from "lucide-react"
+import { Star, Instagram, Paintbrush as Pinterest, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [cart, setCart] = useState([])
 
-  const products = [
+  const featuredProducts = [
     {
       id: 1,
-      name: "Vintage Pearl Bracelet",
-      image: "/vintage-pearl-bracelet.jpg",
-      price: "$42.99",
+      name: "Ruby Heart Necklace",
+      image: "/images/img-20251210-wa0015.jpg",
+      price: 45.99,
+      originalPrice: 57.49,
+      description: "Romantic silver chain with striking red heart pendant",
     },
     {
       id: 2,
-      name: "Delicate Chain Necklace",
-      image: "/delicate-chain-necklace.jpg",
-      price: "$35.50",
+      name: "Garden Bloom Necklace",
+      image: "/images/img-20251210-wa0021.jpg",
+      price: 42.5,
+      originalPrice: 53.13,
+      description: "Vibrant gold chain with mixed gemstone beads",
     },
     {
       id: 3,
-      name: "Statement Beaded Earrings",
-      image: "/statement-beaded-earrings.jpg",
-      price: "$28.99",
-    },
-    {
-      id: 4,
-      name: "Charm Link Bracelet",
-      image: "/charm-link-bracelet.jpg",
-      price: "$48.75",
+      name: "Celestial Dreams Necklace",
+      image: "/images/img-20251210-wa0025.jpg",
+      price: 48.99,
+      originalPrice: 61.24,
+      description: "Ethereal gold chain with colorful enamel charms",
     },
   ]
 
@@ -40,7 +40,7 @@ export default function Home() {
       name: "Emma Richardson",
       role: "Fashion Enthusiast",
       rating: 5,
-      text: "The quality and attention to detail on every piece is incredible. I've received so many compliments on my necklaces. BEADSVILLE's jewelry is truly special.",
+      text: "The quality and attention to detail on every piece is incredible. I've received so many compliments on my necklaces.",
       image: "/professional-woman-portrait.png",
     },
     {
@@ -48,7 +48,7 @@ export default function Home() {
       name: "Marcus Chen",
       role: "Gift Buyer",
       rating: 5,
-      text: "I gift BEADSVILLE jewelry to my loved ones. Each bracelet and necklace comes beautifully presented. The craftsmanship speaks for itself.",
+      text: "I gift BEADSVILLE jewelry to my loved ones. Each bracelet and necklace comes beautifully presented.",
       image: "/professional-man-portrait.png",
     },
     {
@@ -56,122 +56,127 @@ export default function Home() {
       name: "Sophie Laurent",
       role: "Jewelry Collector",
       rating: 5,
-      text: "Finally found a brand that combines vintage aesthetic with modern elegance. My earrings and bracelets are everyday staples now. Highly recommend!",
+      text: "Finally found a brand that combines vintage aesthetic with modern elegance. Highly recommend!",
       image: "/smiling-woman-portrait.png",
     },
   ]
 
+  const handleAddToCart = (product) => {
+    setCart([...cart, product])
+  }
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return
+    const cartSummary = cart.map((p) => `${p.name} - ₦${(p.price * 450).toFixed(0)}`).join("%0A")
+    const message = `Hi! I'd like to order:%0A${cartSummary}%0A%0ATotal: ₦${(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}`
+    window.open(`https://wa.me/2349067480528?text=${message}`, "_blank")
+  }
+
   return (
     <div className="bg-background text-foreground">
-      {/* Header */}
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-24">
             <div className="flex-shrink-0">
-              <img src="/beadsville-logo.jpg" alt="BEADSVILLE - Your Lucky Charm" className="h-16 w-auto" />
+              <img
+                src="/images/beadsville-20logo-202.png"
+                alt="BEADSVILLE - Your Lucky Charm"
+                className="h-20 w-auto"
+              />
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#products" className="hover:text-muted-foreground transition-colors text-sm">
-                Jewelry
+              <a href="#products" className="text-sm hover:text-muted-foreground transition-colors">
+                Collection
               </a>
-              <a href="#reviews" className="hover:text-muted-foreground transition-colors text-sm">
+              <a href="#reviews" className="text-sm hover:text-muted-foreground transition-colors">
                 Reviews
               </a>
-              <a href="#about" className="hover:text-muted-foreground transition-colors text-sm">
+              <a href="#about" className="text-sm hover:text-muted-foreground transition-colors">
                 About
               </a>
-              <button className="px-6 py-2 bg-primary text-primary-foreground hover:bg-opacity-90 transition-all">
-                Shop Now
-              </button>
+              <div className="relative">
+                <ShoppingCart size={20} className="cursor-pointer" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
             </nav>
-
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
           </div>
-
-          {isMenuOpen && (
-            <nav className="md:hidden pb-4 flex flex-col gap-4">
-              <a href="#products" className="text-sm hover:text-muted-foreground">
-                Jewelry
-              </a>
-              <a href="#reviews" className="text-sm hover:text-muted-foreground">
-                Reviews
-              </a>
-              <a href="#about" className="text-sm hover:text-muted-foreground">
-                About
-              </a>
-              <button className="px-6 py-2 bg-primary text-primary-foreground hover:bg-opacity-90 transition-all w-full">
-                Shop Now
-              </button>
-            </nav>
-          )}
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Est. 2018</p>
-            <h2 className="text-5xl md:text-6xl leading-tight mb-6" style={{ fontFamily: "var(--font-serif)" }}>
-              Timeless Jewelry with Soul
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md">
-              Discover our handcrafted collection of bracelets, necklaces, and earrings. Each piece features carefully
-              selected beads strung on delicate chains, combining vintage charm with contemporary elegance.
+      <div className="text-white text-center py-3 bg-destructive">
+        <p className="text-sm font-semibold tracking-wide">EXCLUSIVE: 20% OFF ALL PIECES - CHRISTMAS EDITION</p>
+      </div>
+
+      <section className="relative w-full h-[70vh] min-h-[500px] overflow-hidden">
+        <img
+          src="/images/img-20251210-wa0014.jpg"
+          alt="We Make It, You Wear It - BEADSVILLE Collection"
+          className="w-full h-full object-cover"
+        />
+      </section>
+
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+        <div className="text-center space-y-8">
+          <p className="text-sm tracking-widest text-muted-foreground uppercase">Handcrafted Excellence</p>
+          <h1 className="text-6xl md:text-7xl leading-tight px-8" style={{ fontFamily: "var(--font-serif)" }}>
+            Your Lucky Charm
+          </h1>
+          <div className="max-w-2xl mx-auto px-8 py-6">
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Discover BEADSVILLE's collection of handcrafted bracelets, necklaces, and earrings—each piece a
+              celebration of artistry and elegance, made with pride in Nigeria.
             </p>
-            <button className="px-8 py-3 bg-primary text-primary-foreground hover:bg-opacity-90 transition-all inline-block">
-              Explore Collection
-            </button>
-          </div>
-          <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-            <img
-              src="/jewelry-collection-hero.jpg"
-              alt="BEADSVILLE handcrafted jewelry collection"
-              className="w-full h-full object-cover"
-            />
           </div>
         </div>
       </section>
 
-      {/* Products Section */}
       <section id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="mb-16">
-          <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Featured</p>
-          <h2 className="text-4xl md:text-5xl mb-4" style={{ fontFamily: "var(--font-serif)" }}>
-            Our Jewelry Collections
+        <div className="mb-16 text-center">
+          <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Featured Pieces</p>
+          <h2 className="text-5xl mb-6" style={{ fontFamily: "var(--font-serif)" }}>
+            Curated Collection
           </h2>
-          <div className="w-16 h-1 bg-primary"></div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
+        <div className="grid md:grid-cols-3 gap-12">
+          {featuredProducts.map((product) => (
             <div key={product.id} className="group">
-              <div className="aspect-square bg-muted rounded-lg overflow-hidden mb-4 relative">
+              <div className="aspect-square bg-muted rounded-lg overflow-hidden mb-6 relative">
                 <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                <div className="absolute top-4 right-4 bg-black text-white px-3 py-1 text-xs font-semibold">-20%</div>
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
+              <h3 className="text-2xl font-semibold mb-3" style={{ fontFamily: "var(--font-serif)" }}>
                 {product.name}
               </h3>
-              <div className="flex justify-between items-center">
-                <p className="text-muted-foreground">{product.price}</p>
-                <button className="text-sm underline hover:text-primary transition-colors">Add to Cart</button>
+              <p className="text-muted-foreground mb-4 text-sm">{product.description}</p>
+              <div className="flex items-center gap-3 mb-6">
+                <p className="text-xl font-bold">₦{(product.price * 450).toFixed(0)}</p>
+                <p className="text-sm text-muted-foreground line-through">
+                  ₦{(product.originalPrice * 450).toFixed(0)}
+                </p>
               </div>
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="w-full px-6 py-3 bg-primary text-primary-foreground hover:bg-opacity-90 transition-all text-sm font-semibold"
+              >
+                Add to Cart
+              </button>
             </div>
           ))}
         </div>
 
-        <div className="flex justify-center mt-12">
+        <div className="flex justify-center mt-16">
           <Link href="/collection">
-            <button className="px-8 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+            <button className="px-8 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-semibold">
               View More
             </button>
           </Link>
@@ -180,12 +185,11 @@ export default function Home() {
 
       {/* Reviews Section */}
       <section id="reviews" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-        <div className="mb-16">
+        <div className="mb-16 text-center">
           <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Testimonials</p>
-          <h2 className="text-4xl md:text-5xl mb-4" style={{ fontFamily: "var(--font-serif)" }}>
-            What Our Customers Say
+          <h2 className="text-5xl mb-6" style={{ fontFamily: "var(--font-serif)" }}>
+            Loved by Customers
           </h2>
-          <div className="w-16 h-1 bg-primary"></div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -215,106 +219,97 @@ export default function Home() {
         </div>
       </section>
 
+      {cart.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="bg-muted p-8 rounded-lg">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-serif)" }}>
+                Cart Summary
+              </h3>
+              <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}</p>
+            </div>
+            <div className="mb-6 space-y-2">
+              {cart.map((item, idx) => (
+                <p key={idx} className="text-sm text-muted-foreground">
+                  {item.name} - ₦{(item.price * 450).toFixed(0)}
+                </p>
+              ))}
+            </div>
+            <button
+              onClick={handleCheckout}
+              className="w-full px-6 py-3 bg-black text-white hover:bg-opacity-90 transition-all font-semibold"
+            >
+              Proceed to WhatsApp
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* About Section */}
       <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-            <img
-              src="/beadsville-craft-studio.jpg"
-              alt="BEADSVILLE craft studio"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div>
-            <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Our Story</p>
-            <h2 className="text-4xl md:text-5xl mb-6" style={{ fontFamily: "var(--font-serif)" }}>
-              Crafted with Passion
-            </h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              Founded in 2018, BEADSVILLE emerged from a simple passion: to create beautiful, handcrafted jewelry that
-              celebrates artistry and individuality. Every bracelet, necklace, and pair of earrings is thoughtfully
-              designed and carefully assembled.
-            </p>
-            <p className="text-muted-foreground mb-6 leading-relaxed">
-              We combine vintage-inspired beads with quality chains to create timeless pieces that become treasured
-              accessories. From delicate everyday wear to statement pieces, each creation reflects our commitment to
-              craftsmanship and attention to detail.
-            </p>
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <p className="text-3xl font-bold mb-2">2K+</p>
-                <p className="text-sm text-muted-foreground">Happy Customers</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold mb-2">500+</p>
-                <p className="text-sm text-muted-foreground">Unique Pieces</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="bg-primary text-primary-foreground p-12 md:p-20 text-center rounded-lg">
-          <h2 className="text-4xl md:text-5xl mb-4" style={{ fontFamily: "var(--font-serif)" }}>
-            Find Your Perfect Piece
+        <div className="text-center max-w-3xl mx-auto">
+          <p className="text-sm tracking-widest text-muted-foreground uppercase mb-6">Our Story</p>
+          <h2 className="text-5xl mb-8" style={{ fontFamily: "var(--font-serif)" }}>
+            Crafted with Purpose
           </h2>
-          <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
-            Discover handcrafted bracelets, necklaces, and earrings that bring elegance to your everyday life.
+          <p className="text-muted-foreground mb-6 leading-relaxed text-lg">
+            BEADSVILLE is a Nigerian brand dedicated to creating handcrafted jewelry that celebrates artistry and
+            individuality. Every piece is thoughtfully designed and carefully assembled with premium beads and delicate
+            chains.
           </p>
-          <button className="px-8 py-3 bg-primary-foreground text-primary hover:bg-opacity-90 transition-all inline-block font-semibold">
-            Shop Now
-          </button>
+          <p className="text-muted-foreground leading-relaxed text-lg">
+            We believe in creating timeless accessories that become treasured possessions—combining vintage charm with
+            contemporary elegance, one piece at a time.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-20">
+      <footer className="border-t border-border mt-20 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="font-bold mb-4" style={{ fontFamily: "var(--font-serif)" }}>
                 BEADSVILLE
               </h3>
-              <p className="text-sm text-muted-foreground">Timeless jewelry for modern souls.</p>
+              <p className="text-sm text-muted-foreground">Your Lucky Charm — Made in Nigeria</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-sm">Shop</h4>
               <ul className="text-sm text-muted-foreground space-y-2">
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/collection" className="hover:text-foreground transition-colors">
                     Bracelets
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/collection" className="hover:text-foreground transition-colors">
                     Necklaces
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/collection" className="hover:text-foreground transition-colors">
                     Earrings
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-sm">Support</h4>
+              <h4 className="font-semibold mb-4 text-sm">Contact</h4>
               <ul className="text-sm text-muted-foreground space-y-2">
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Contact
+                  <a
+                    href="https://wa.me/2349067480528"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    WhatsApp
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    FAQ
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Shipping
+                    Email
                   </a>
                 </li>
               </ul>
@@ -344,16 +339,11 @@ export default function Home() {
                     Pinterest
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Newsletter
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 BEADSVILLE. All rights reserved.</p>
+            <p>&copy; 2025 BEADSVILLE - Your Lucky Charm. Made in Nigeria with love.</p>
           </div>
         </div>
       </footer>
