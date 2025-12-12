@@ -335,7 +335,7 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <a href="beadsville569@gmail.com" className="hover:text-foreground transition-colors">
+                  <a href="mailto:beadsville569@gmail.com" className="hover:text-foreground transition-colors">
                     Email
                   </a>
                 </li>
