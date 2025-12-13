@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Save, Lock, Trash2, Plus } from "lucide-react"
 import { products, reviews } from "@/data/products"
 
@@ -11,6 +11,29 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("products")
 
   const ADMIN_PASSWORD = "beadsville2025"
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const savedProducts = localStorage.getItem("beadsville_products")
+      const savedReviews = localStorage.getItem("beadsville_reviews")
+
+      if (savedProducts) {
+        try {
+          setEditingProducts(JSON.parse(savedProducts))
+        } catch (e) {
+          setEditingProducts(products)
+        }
+      }
+
+      if (savedReviews) {
+        try {
+          setEditingReviews(JSON.parse(savedReviews))
+        } catch (e) {
+          setEditingReviews(reviews)
+        }
+      }
+    }
+  }, [isAuthenticated])
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -62,8 +85,6 @@ export default function AdminPage() {
         name: "New Reviewer",
         rating: 5,
         text: "Review text",
-        role: "",
-        image: "",
       },
     ])
   }
