@@ -2,10 +2,23 @@
 
 import { Star, Instagram, Paintbrush as Pinterest, ShoppingCart, X } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { reviews as defaultReviews, type Review } from "@/data/products"
 
 export default function Home() {
+  const [reviews, setReviews] = useState<Review[]>(defaultReviews)
   const [cart, setCart] = useState([])
+
+  useEffect(() => {
+    const saved = localStorage.getItem("beadsville_reviews")
+    if (saved) {
+      try {
+        setReviews(JSON.parse(saved))
+      } catch (e) {
+        setReviews(defaultReviews)
+      }
+    }
+  }, [])
 
   const featuredProducts = [
     {
@@ -31,33 +44,6 @@ export default function Home() {
       price: 48.99,
       originalPrice: 61.24,
       description: "Ethereal gold chain with colorful enamel charms",
-    },
-  ]
-
-  const reviews = [
-    {
-      id: 1,
-      name: "Emma Richardson",
-      role: "Fashion Enthusiast",
-      rating: 5,
-      text: "The quality and attention to detail on every piece is incredible. I've received so many compliments on my necklaces.",
-      image: "/professional-woman-portrait.png",
-    },
-    {
-      id: 2,
-      name: "Marcus Chen",
-      role: "Gift Buyer",
-      rating: 5,
-      text: "I gift BEADSVILLE jewelry to my loved ones. Each bracelet and necklace comes beautifully presented.",
-      image: "/professional-man-portrait.png",
-    },
-    {
-      id: 3,
-      name: "Sophie Laurent",
-      role: "Jewelry Collector",
-      rating: 5,
-      text: "Finally found a brand that combines vintage aesthetic with modern elegance. Highly recommend!",
-      image: "/smiling-woman-portrait.png",
     },
   ]
 
@@ -212,19 +198,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-muted-foreground mb-6 leading-relaxed italic">"{review.text}"</p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-muted overflow-hidden">
-                  <img
-                    src={review.image || "/placeholder.svg"}
-                    alt={review.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">{review.name}</p>
-                  <p className="text-xs text-muted-foreground">{review.role}</p>
-                </div>
-              </div>
+              <p className="font-semibold text-sm">{review.name}</p>
             </div>
           ))}
         </div>
@@ -237,7 +211,7 @@ export default function Home() {
               <h3 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-serif)" }}>
                 Cart Summary
               </h3>
-              <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}</p>
+              <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0) * 1).toFixed(0)}</p>
             </div>
             <div className="mb-6 space-y-3">
               {cart.map((item, idx) => (
@@ -314,11 +288,10 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/collection"
-                  className="hover:text-foreground transition-colors">
+                  <Link href="/collection" className="hover:text-foreground transition-colors">
                     Phone Charms
                   </Link>
-                </li> 
+                </li>
               </ul>
             </div>
             <div>
