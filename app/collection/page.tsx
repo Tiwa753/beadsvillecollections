@@ -1,21 +1,44 @@
 "use client"
 import Link from "next/link"
+import type React from "react"
+
 import { useState, useEffect } from "react"
-import { Instagram, Paintbrush as Pinterest, ShoppingCart, X, Check, Upload } from "lucide-react"
+import {
+  Instagram,
+  Paintbrush as Pinterest,
+  ShoppingCart,
+  X,
+  Check,
+  Upload,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Minus,
+  Sparkles,
+  Package,
+} from "lucide-react"
 import { products as defaultProducts, type Product } from "@/data/products"
+
+interface CartItem extends Product {
+  quantity: number
+}
 
 export default function CollectionPage() {
   const [allProducts, setAllProducts] = useState<Product[]>(defaultProducts)
-
   const [filter, setFilter] = useState("all")
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = useState<CartItem[]>([])
   const [showNotification, setShowNotification] = useState(false)
   const [notificationProduct, setNotificationProduct] = useState("")
+
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [quantity, setQuantity] = useState(1)
+
   const [customOrder, setCustomOrder] = useState({
     type: "necklace",
     description: "",
-    images: [],
-    imageFiles: [],
+    images: [] as string[],
+    imageFiles: [] as File[],
   })
 
   useEffect(() => {
@@ -31,17 +54,35 @@ export default function CollectionPage() {
 
   const filteredProducts = filter === "all" ? allProducts : allProducts.filter((p) => p.category === filter)
 
-  const handleAddToCart = (product) => {
-    setCart([...cart, product])
-    setNotificationProduct(product.name)
+  const handleAddToCart = (product: Product, qty = 1) => {
+    const existingIndex = cart.findIndex((item) => item.id === product.id)
+    if (existingIndex >= 0) {
+      const newCart = [...cart]
+      newCart[existingIndex].quantity += qty
+      setCart(newCart)
+    } else {
+      setCart([...cart, { ...product, quantity: qty }])
+    }
+    setNotificationProduct(`${qty}x ${product.name}`)
     setShowNotification(true)
-    setTimeout(() => {
-      setShowNotification(false)
-    }, 3000)
+    setTimeout(() => setShowNotification(false), 3000)
+    setSelectedProduct(null)
+    setQuantity(1)
+    setCurrentImageIndex(0)
   }
 
-  const removeFromCart = (indexToRemove) => {
+  const removeFromCart = (indexToRemove: number) => {
     setCart(cart.filter((_, index) => index !== indexToRemove))
+  }
+
+  const updateCartQuantity = (index: number, newQty: number) => {
+    if (newQty <= 0) {
+      removeFromCart(index)
+    } else {
+      const newCart = [...cart]
+      newCart[index].quantity = newQty
+      setCart(newCart)
+    }
   }
 
   const scrollToCart = () => {
@@ -51,15 +92,30 @@ export default function CollectionPage() {
     }
   }
 
+  const getTotalItems = () => cart.reduce((sum, item) => sum + item.quantity, 0)
+  const getTotalPrice = () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
   const handleCheckout = () => {
     if (cart.length === 0) return
-    const cartSummary = cart.map((p) => `${p.name} - ₦${(p.price * 450).toFixed(0)}`).join("%0A")
-    const message = `Hi! I'd like to order:%0A${cartSummary}%0A%0ATotal: ₦${(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}`
+    const cartSummary = cart.map((p) => `${p.quantity}x ${p.name} - ₦${(p.price * p.quantity).toFixed(0)}`).join("%0A")
+    const message = `Hi! I'd like to order:%0A${cartSummary}%0A%0ATotal: ₦${getTotalPrice().toFixed(0)}`
     window.open(`https://wa.me/2349067480528?text=${message}`, "_blank")
   }
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files)
+  const nextImage = () => {
+    if (selectedProduct?.images) {
+      setCurrentImageIndex((prev) => (prev + 1) % selectedProduct.images!.length)
+    }
+  }
+
+  const prevImage = () => {
+    if (selectedProduct?.images) {
+      setCurrentImageIndex((prev) => (prev - 1 + selectedProduct.images!.length) % selectedProduct.images!.length)
+    }
+  }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
     const imageUrls = files.map((file) => URL.createObjectURL(file))
     setCustomOrder({
       ...customOrder,
@@ -68,7 +124,7 @@ export default function CollectionPage() {
     })
   }
 
-  const removeImage = (indexToRemove) => {
+  const removeImage = (indexToRemove: number) => {
     setCustomOrder({
       ...customOrder,
       images: customOrder.images.filter((_, index) => index !== indexToRemove),
@@ -76,18 +132,28 @@ export default function CollectionPage() {
     })
   }
 
-  const handleCustomOrder = () => {
+  const handleCustomOrder = async () => {
     if (!customOrder.description.trim()) {
       alert("Please describe your custom order")
       return
     }
-    const imageNote =
-      customOrder.images.length > 0
-        ? `%0A%0AI have ${customOrder.images.length} reference image(s) to share. I'll send them in the next message.`
-        : ""
-    const message = `Hi! I'd like to place a custom order:%0A%0AType: ${customOrder.type.charAt(0).toUpperCase() + customOrder.type.slice(1)}%0ADescription: ${customOrder.description}${imageNote}`
+
+    let message = `Hi! I'd like to place a custom order:%0A%0AType: ${customOrder.type.charAt(0).toUpperCase() + customOrder.type.slice(1)}%0ADescription: ${customOrder.description}`
+
+    if (customOrder.imageFiles.length > 0) {
+      message += `%0A%0AReference Images: ${customOrder.imageFiles.length} image(s) attached`
+    }
+
     window.open(`https://wa.me/2349067480528?text=${message}`, "_blank")
-    setCustomOrder({ type: "necklace", description: "", images: [], imageFiles: [] })
+
+    setTimeout(() => {
+      if (customOrder.images.length > 0) {
+        alert(
+          `Your custom order message has been sent! Please send the ${customOrder.images.length} reference image(s) in the WhatsApp conversation.`,
+        )
+      }
+      setCustomOrder({ type: "necklace", description: "", images: [], imageFiles: [] })
+    }, 1000)
   }
 
   return (
@@ -96,6 +162,121 @@ export default function CollectionPage() {
         <div className="fixed top-20 right-4 z-50 bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-top">
           <Check size={20} />
           <span className="font-semibold">{notificationProduct} added to cart!</span>
+        </div>
+      )}
+
+      {selectedProduct && (
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setSelectedProduct(null)
+            setQuantity(1)
+            setCurrentImageIndex(0)
+          }}
+        >
+          <div
+            className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Image Slideshow */}
+            <div className="relative aspect-square bg-muted">
+              <img
+                src={selectedProduct.images?.[currentImageIndex] || selectedProduct.image}
+                alt={selectedProduct.name}
+                className="w-full h-full object-cover"
+              />
+
+              {/* Slideshow Navigation */}
+              {selectedProduct.images && selectedProduct.images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+
+                  {/* Image Indicators */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {selectedProduct.images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`w-2 h-2 rounded-full transition-colors ${idx === currentImageIndex ? "bg-white" : "bg-white/50"}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Close Button */}
+              <button
+                onClick={() => {
+                  setSelectedProduct(null)
+                  setQuantity(1)
+                  setCurrentImageIndex(0)
+                }}
+                className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Discount Badge */}
+              <div className="absolute top-4 left-4 bg-destructive text-white px-3 py-1 text-xs font-bold rounded">
+                -20% OFF
+              </div>
+            </div>
+
+            {/* Product Details */}
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
+                {selectedProduct.name}
+              </h2>
+              <p className="text-muted-foreground mb-4">{selectedProduct.description}</p>
+
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-3xl font-bold">₦{selectedProduct.price.toFixed(0)}</span>
+                <span className="text-lg text-muted-foreground line-through">
+                  ₦{(selectedProduct.originalPrice * 450).toFixed(0)}
+                </span>
+              </div>
+
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-6 mb-6">
+                <span className="font-semibold">Quantity:</span>
+                <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-2 hover:bg-background rounded-lg transition-colors"
+                  >
+                    <Minus size={18} />
+                  </button>
+                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-2 hover:bg-background rounded-lg transition-colors"
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Add to Cart Button */}
+              <button
+                onClick={() => handleAddToCart(selectedProduct, quantity)}
+                className="w-full py-4 bg-primary text-primary-foreground font-bold text-lg hover:bg-opacity-90 transition-all rounded-lg flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={20} />
+                Add {quantity} to Cart — ₦{(selectedProduct.price * quantity).toFixed(0)}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -122,9 +303,9 @@ export default function CollectionPage() {
               </a>
               <div className="relative cursor-pointer" onClick={scrollToCart}>
                 <ShoppingCart size={20} />
-                {cart.length > 0 && (
+                {getTotalItems() > 0 && (
                   <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cart.length}
+                    {getTotalItems()}
                   </span>
                 )}
               </div>
@@ -154,54 +335,31 @@ export default function CollectionPage() {
       {/* Filter Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="flex flex-wrap gap-4 justify-center">
-          <button
-            onClick={() => setFilter("all")}
-            className={`px-6 py-2 border-2 transition-all ${
-              filter === "all"
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border text-foreground hover:border-primary"
-            }`}
-          >
-            All Items
-          </button>
-          <button
-            onClick={() => setFilter("necklaces")}
-            className={`px-6 py-2 border-2 transition-all ${
-              filter === "necklaces"
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border text-foreground hover:border-primary"
-            }`}
-          >
-            Necklaces
-          </button>
-          <button
-            onClick={() => setFilter("phone-charms")}
-            className={`px-6 py-2 border-2 transition-all ${
-              filter === "phone-charms"
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border text-foreground hover:border-primary"
-            }`}
-          >
-            Phone Charms
-          </button>
-          <button
-            onClick={() => setFilter("bracelets")}
-            className={`px-6 py-2 border-2 transition-all ${
-              filter === "bracelets"
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border text-foreground hover:border-primary"
-            }`}
-          >
-            Bracelets
-          </button>
+          {["all", "necklaces", "phone-charms", "bracelets"].map((filterOption) => (
+            <button
+              key={filterOption}
+              onClick={() => setFilter(filterOption)}
+              className={`px-6 py-2 border-2 transition-all ${
+                filter === filterOption
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-border text-foreground hover:border-primary"
+              }`}
+            >
+              {filterOption === "all"
+                ? "All Items"
+                : filterOption === "phone-charms"
+                  ? "Phone Charms"
+                  : filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+            </button>
+          ))}
         </div>
       </section>
 
-      {/* Products Grid */}
+      {/* Products Grid - Made products clickable to open modal */}
       <section id="collection" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="group">
+            <div key={product.id} className="group cursor-pointer" onClick={() => setSelectedProduct(product)}>
               <div className="aspect-square bg-muted rounded-lg overflow-hidden mb-4 relative">
                 <img
                   src={product.image || "/placeholder.svg"}
@@ -209,28 +367,38 @@ export default function CollectionPage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-4 right-4 bg-black text-white px-3 py-1 text-xs font-semibold">-20%</div>
+                {/* Image count indicator */}
+                {product.images && product.images.length > 1 && (
+                  <div className="absolute bottom-3 right-3 bg-black/60 text-white px-2 py-1 text-xs rounded flex items-center gap-1">
+                    <span>{product.images.length} photos</span>
+                  </div>
+                )}
               </div>
               <h3 className="text-lg font-semibold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
                 {product.name}
               </h3>
-              <p className="text-muted-foreground mb-3 text-sm">{product.description}</p>
+              <p className="text-muted-foreground mb-3 text-sm line-clamp-2">{product.description}</p>
               <div className="flex items-center gap-2 mb-4">
-                <p className="font-bold">₦{(product.price * 1).toFixed(0)}</p>
+                <p className="font-bold">₦{product.price.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground line-through">
                   ₦{(product.originalPrice * 450).toFixed(0)}
                 </p>
               </div>
               <button
-                onClick={() => handleAddToCart(product)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedProduct(product)
+                }}
                 className="w-full px-4 py-2 bg-primary text-primary-foreground hover:bg-opacity-90 transition-all text-sm font-semibold active:scale-95"
               >
-                Add to Cart
+                View & Add to Cart
               </button>
             </div>
           ))}
         </div>
       </section>
 
+      {/* Custom Orders Section */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="bg-muted p-8 rounded-lg">
           <div className="text-center mb-8">
@@ -244,22 +412,18 @@ export default function CollectionPage() {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold mb-3">Choose Type</label>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {["necklace", "earrings", "bracelet", "phone-charm"].map((type) => (
                   <button
                     key={type}
                     onClick={() => setCustomOrder({ ...customOrder, type })}
-                    className={`px-6 py-3 border-2 transition-all capitalize ${
+                    className={`px-4 py-3 border-2 transition-all capitalize text-sm ${
                       customOrder.type === type
                         ? "bg-primary text-primary-foreground border-primary"
                         : "border-border hover:border-primary"
                     }`}
                   >
-                    {type === "phone-charm"
-                      ? "Phone Charm"
-                      : type === "earrings"
-                        ? "Earrings"
-                        : type.charAt(0).toUpperCase() + type.slice(1)}
+                    {type === "phone-charm" ? "Phone Charm" : type.charAt(0).toUpperCase() + type.slice(1)}
                   </button>
                 ))}
               </div>
@@ -316,7 +480,7 @@ export default function CollectionPage() {
 
             <button
               onClick={handleCustomOrder}
-              className="w-full px-6 py-3 bg-black text-white hover:bg-opacity-90 transition-all font-semibold"
+              className="w-full px-6 py-3 bg-black text-white hover:bg-opacity-90 transition-all font-semibold rounded-lg"
             >
               Send Custom Order Request
             </button>
@@ -325,37 +489,117 @@ export default function CollectionPage() {
       </section>
 
       {cart.length > 0 && (
-        <section id="cart-summary" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-muted p-8 rounded-lg">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-serif)" }}>
-                Cart Summary
-              </h3>
-              <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}</p>
-            </div>
-            <div className="mb-6 space-y-3">
-              {cart.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-background p-3 rounded">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">₦{(item.price * 450).toFixed(0)}</p>
+        <section id="cart-summary" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="bg-gradient-to-br from-muted to-muted/50 rounded-2xl overflow-hidden shadow-xl border border-border">
+            {/* Cart Header */}
+            <div className="bg-primary text-primary-foreground p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/20 p-3 rounded-full">
+                    <ShoppingCart size={24} />
                   </div>
+                  <div>
+                    <h3 className="text-2xl font-bold" style={{ fontFamily: "var(--font-serif)" }}>
+                      Your Cart
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      {getTotalItems()} item{getTotalItems() !== 1 ? "s" : ""} selected
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm opacity-90">Total</p>
+                  <p className="text-3xl font-bold">₦{getTotalPrice().toFixed(0)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cart Items */}
+            <div className="p-6 space-y-4">
+              {cart.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-background rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Product Image */}
+                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                    <img
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-lg truncate" style={{ fontFamily: "var(--font-serif)" }}>
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">₦{item.price.toFixed(0)} each</p>
+                  </div>
+
+                  {/* Quantity Controls */}
+                  <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+                    <button
+                      onClick={() => updateCartQuantity(idx, item.quantity - 1)}
+                      className="p-2 hover:bg-background rounded transition-colors"
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <span className="w-8 text-center font-bold">{item.quantity}</span>
+                    <button
+                      onClick={() => updateCartQuantity(idx, item.quantity + 1)}
+                      className="p-2 hover:bg-background rounded transition-colors"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+
+                  {/* Item Total */}
+                  <div className="text-right w-24">
+                    <p className="font-bold text-lg">₦{(item.price * item.quantity).toFixed(0)}</p>
+                  </div>
+
+                  {/* Remove Button */}
                   <button
                     onClick={() => removeFromCart(idx)}
-                    className="ml-4 p-1 hover:bg-muted rounded-full transition-colors"
-                    aria-label="Remove item"
+                    className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors"
                   >
-                    <X size={18} className="text-muted-foreground hover:text-destructive" />
+                    <X size={20} />
                   </button>
                 </div>
               ))}
             </div>
-            <button
-              onClick={handleCheckout}
-              className="w-full px-6 py-3 bg-black text-white hover:bg-opacity-90 transition-all font-semibold"
-            >
-              Complete Order on WhatsApp
-            </button>
+
+            {/* Cart Footer */}
+            <div className="border-t border-border p-6 bg-background/50">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Package size={18} />
+                    <span>Free delivery in Lagos</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={18} />
+                    <span>Gift wrapping available</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">Subtotal</p>
+                  <p className="text-2xl font-bold">₦{getTotalPrice().toFixed(0)}</p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCheckout}
+                className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+              >
+                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                </svg>
+                Complete Order on WhatsApp
+              </button>
+            </div>
           </div>
         </section>
       )}

@@ -1,6 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Save, Lock, Trash2, Plus } from "lucide-react"
+import type React from "react"
+
+import { Save, Lock, Trash2, Plus, Upload, X, ImageIcon } from "lucide-react"
 import { products, reviews } from "@/data/products"
 
 export default function AdminPage() {
@@ -35,7 +37,7 @@ export default function AdminPage() {
     }
   }, [isAuthenticated])
 
-  const handleLogin = (e) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (password === ADMIN_PASSWORD) {
       setIsAuthenticated(true)
@@ -46,8 +48,69 @@ export default function AdminPage() {
     }
   }
 
-  const handleProductChange = (id, field, value) => {
+  const handleProductChange = (id: number, field: string, value: any) => {
     setEditingProducts(editingProducts.map((p) => (p.id === id ? { ...p, [field]: value } : p)))
+  }
+
+  const handleProductImageUpload = (id: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const result = reader.result as string
+        handleProductChange(id, "image", result)
+        // Also add to images array as first image
+        const product = editingProducts.find((p) => p.id === id)
+        const currentImages = product?.images || []
+        if (currentImages.length === 0) {
+          handleProductChange(id, "images", [result])
+        } else {
+          handleProductChange(id, "images", [result, ...currentImages.slice(1)])
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleAdditionalImageUpload = (id: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) {
+      const product = editingProducts.find((p) => p.id === id)
+      const currentImages = product?.images || [product?.image || ""]
+
+      files.forEach((file) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          const result = reader.result as string
+          setEditingProducts((prev) =>
+            prev.map((p) => {
+              if (p.id === id) {
+                const existingImages = p.images || [p.image]
+                return { ...p, images: [...existingImages, result] }
+              }
+              return p
+            }),
+          )
+        }
+        reader.readAsDataURL(file)
+      })
+    }
+  }
+
+  const handleRemoveImage = (productId: number, imageIndex: number) => {
+    setEditingProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === productId && p.images) {
+          const newImages = p.images.filter((_, idx) => idx !== imageIndex)
+          return {
+            ...p,
+            images: newImages,
+            image: newImages[0] || p.image, // Update main image if first one is removed
+          }
+        }
+        return p
+      }),
+    )
   }
 
   const handleAddProduct = () => {
@@ -59,6 +122,7 @@ export default function AdminPage() {
         name: "New Product",
         category: "necklaces",
         image: "/placeholder.svg",
+        images: [],
         price: 0,
         originalPrice: 0,
         description: "Product description",
@@ -66,13 +130,13 @@ export default function AdminPage() {
     ])
   }
 
-  const handleDeleteProduct = (id) => {
+  const handleDeleteProduct = (id: number) => {
     if (confirm("Are you sure you want to delete this product?")) {
       setEditingProducts(editingProducts.filter((p) => p.id !== id))
     }
   }
 
-  const handleReviewChange = (id, field, value) => {
+  const handleReviewChange = (id: number, field: string, value: any) => {
     setEditingReviews(editingReviews.map((r) => (r.id === id ? { ...r, [field]: value } : r)))
   }
 
@@ -89,7 +153,7 @@ export default function AdminPage() {
     ])
   }
 
-  const handleDeleteReview = (id) => {
+  const handleDeleteReview = (id: number) => {
     if (confirm("Are you sure you want to delete this review?")) {
       setEditingReviews(editingReviews.filter((r) => r.id !== id))
     }
@@ -100,7 +164,7 @@ export default function AdminPage() {
       localStorage.setItem("beadsville_products", JSON.stringify(editingProducts))
       localStorage.setItem("beadsville_reviews", JSON.stringify(editingReviews))
       alert("Changes saved successfully!")
-    } catch (error) {
+    } catch (error: any) {
       alert("Error saving changes: " + error.message)
     }
   }
@@ -183,7 +247,9 @@ export default function AdminPage() {
         {activeTab === "products" && (
           <div className="space-y-6">
             <div className="bg-muted p-4 rounded-lg flex justify-between items-center">
-              <p className="text-sm text-muted-foreground">Edit product details or add new products.</p>
+              <p className="text-sm text-muted-foreground">
+                Edit product details, add multiple images, or add new products.
+              </p>
               <button
                 onClick={handleAddProduct}
                 className="px-4 py-2 bg-primary text-primary-foreground font-semibold hover:bg-opacity-90 transition-all flex items-center gap-2 text-sm"
@@ -224,12 +290,79 @@ export default function AdminPage() {
                   </button>
                 </div>
 
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold mb-2">
+                    Product Images (First image is the main one)
+                  </label>
+
+                  {/* Current Images Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-4">
+                    {(product.images && product.images.length > 0 ? product.images : [product.image]).map(
+                      (img, idx) => (
+                        <div
+                          key={idx}
+                          className="relative group aspect-square rounded-lg overflow-hidden border-2 border-border"
+                        >
+                          <img
+                            src={img || "/placeholder.svg"}
+                            alt={`${product.name} ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {idx === 0 && (
+                            <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                              Main
+                            </div>
+                          )}
+                          <button
+                            onClick={() => handleRemoveImage(product.id, idx)}
+                            className="absolute top-1 right-1 bg-destructive text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ),
+                    )}
+
+                    {/* Add More Images Button */}
+                    <label className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary transition-colors cursor-pointer flex flex-col items-center justify-center gap-2 bg-muted/50">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => handleAdditionalImageUpload(product.id, e)}
+                        className="hidden"
+                      />
+                      <ImageIcon size={24} className="text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground text-center">Add Photos</span>
+                    </label>
+                  </div>
+
+                  {/* Upload Main Image */}
+                  <div className="flex gap-4 items-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleProductImageUpload(product.id, e)}
+                      className="hidden"
+                      id={`main-image-upload-${product.id}`}
+                    />
+                    <label
+                      htmlFor={`main-image-upload-${product.id}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-border hover:border-primary transition-colors cursor-pointer rounded text-sm"
+                    >
+                      <Upload size={16} />
+                      Change Main Image
+                    </label>
+                    <span className="text-xs text-muted-foreground">{product.images?.length || 1} photo(s) total</span>
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-semibold mb-2">Price (NGN)</label>
                     <input
                       type="number"
-                      step="1000"
+                      step="100"
                       value={product.price}
                       onChange={(e) => handleProductChange(product.id, "price", Number.parseFloat(e.target.value))}
                       className="w-full px-4 py-2 border-2 border-border bg-background rounded-lg focus:border-primary focus:outline-none"
@@ -239,7 +372,7 @@ export default function AdminPage() {
                     <label className="block text-sm font-semibold mb-2">Original Price (NGN)</label>
                     <input
                       type="number"
-                      step="1000"
+                      step="100"
                       value={product.originalPrice}
                       onChange={(e) =>
                         handleProductChange(product.id, "originalPrice", Number.parseFloat(e.target.value))
