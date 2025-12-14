@@ -261,7 +261,7 @@ export default function Home() {
           <div className="order-1 md:order-2 flex justify-center">
             <div className="w-72 h-72 md:w-80 md:h-80 rounded-lg overflow-hidden shadow-lg">
               <img
-                src="/beadsville-artisan-workshop-vintage.jpg"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20251214-WA0044-Dh8X1tPjzYinKuzZdj666gVgn0Bh8e.jpg"
                 alt="BEADSVILLE Workshop - Where the magic happens"
                 className="w-full h-full object-cover"
               />
