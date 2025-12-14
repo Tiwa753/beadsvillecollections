@@ -335,7 +335,7 @@ export default function CollectionPage() {
       {/* Filter Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="flex flex-wrap gap-4 justify-center">
-          {["all", "necklaces", "phone-charms", "bracelets"].map((filterOption) => (
+          {["all", "necklaces", "phone-charms", "bracelets", "earrings"].map((filterOption) => (
             <button
               key={filterOption}
               onClick={() => setFilter(filterOption)}
@@ -576,8 +576,8 @@ export default function CollectionPage() {
               <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <Package size={18} />
-                    <span>Free delivery in Lagos</span>
+                    
+                    
                   </div>
                   <div className="flex items-center gap-2">
                     <Sparkles size={18} />
@@ -631,6 +631,11 @@ export default function CollectionPage() {
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
                     Necklaces
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Earrings
                   </a>
                 </li>
                 <li>

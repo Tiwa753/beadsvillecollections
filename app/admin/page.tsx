@@ -280,6 +280,7 @@ export default function AdminPage() {
                       <option value="necklaces">Necklaces</option>
                       <option value="phone-charms">Phone Charms</option>
                       <option value="bracelets">Bracelets</option>
+                      <option value="earrings">Earrings</option>
                     </select>
                   </div>
                   <button
