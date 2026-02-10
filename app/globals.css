@@ -122,6 +122,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Preserving original custom background gradient */
     background: linear-gradient(135deg, #ffffff 0%, #c8e6ff 40%, #e8d4f8 100%);
     background-attachment: fixed;
   }
