@@ -117,7 +117,7 @@ export default function Home() {
         />
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 marblely-gradient rounded-2xl my-12">
         <div className="text-center space-y-8">
           <p className="text-sm tracking-widest text-muted-foreground uppercase">Handcrafted Excellence</p>
           <h1 className="text-6xl md:text-7xl leading-tight px-8" style={{ fontFamily: "var(--font-serif)" }}>
@@ -172,11 +172,11 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center mt-16">
-          <Link href="/collection">
+          <a href="/collection">
             <button className="px-8 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-semibold">
               View More
             </button>
-          </Link>
+          </a>
         </div>
       </section>
 
@@ -242,29 +242,31 @@ export default function Home() {
 
       {/* About Section */}
       <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="order-2 md:order-1">
-            <p className="text-sm tracking-widest text-muted-foreground uppercase mb-6">Our Story</p>
-            <h2 className="text-5xl mb-8" style={{ fontFamily: "var(--font-serif)" }}>
-              Crafted with Purpose
-            </h2>
-            <p className="text-muted-foreground mb-6 leading-relaxed text-lg">
-              BEADSVILLE is a Nigerian brand dedicated to creating handcrafted jewelry that celebrates artistry and
-              individuality. Every piece is thoughtfully designed and carefully assembled with premium beads and
-              delicate chains.
-            </p>
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              We believe in creating timeless accessories that become treasured possessions—combining vintage charm with
-              contemporary elegance, one piece at a time.
-            </p>
-          </div>
-          <div className="order-1 md:order-2 flex justify-center">
-            <div className="w-72 h-72 md:w-80 md:h-80 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20251214-WA0044-Dh8X1tPjzYinKuzZdj666gVgn0Bh8e.jpg"
-                alt="BEADSVILLE Workshop - Where the magic happens"
-                className="w-full h-full object-cover"
-              />
+        <div className="marblely-gradient rounded-2xl p-12 md:p-16">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1">
+              <p className="text-sm tracking-widest text-muted-foreground uppercase mb-6">Our Story</p>
+              <h2 className="text-5xl mb-8" style={{ fontFamily: "var(--font-serif)" }}>
+                Crafted with Purpose
+              </h2>
+              <p className="text-muted-foreground mb-6 leading-relaxed text-lg">
+                BEADSVILLE is a Nigerian brand dedicated to creating handcrafted jewelry that celebrates artistry and
+                individuality. Every piece is thoughtfully designed and carefully assembled with premium beads and
+                delicate chains.
+              </p>
+              <p className="text-muted-foreground leading-relaxed text-lg">
+                We believe in creating timeless accessories that become treasured possessions—combining vintage charm with
+                contemporary elegance, one piece at a time.
+              </p>
+            </div>
+            <div className="order-1 md:order-2 flex justify-center">
+              <div className="w-72 h-72 md:w-80 md:h-80 rounded-lg overflow-hidden shadow-lg">
+                <img
+                  src="/images/img-20251214-wa0044.jpg"
+                  alt="BEADSVILLE Workshop - Where the magic happens"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>

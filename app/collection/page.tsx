@@ -306,7 +306,7 @@ export default function CollectionPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 marblely-gradient rounded-2xl my-8">
         <div className="text-center">
           <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Complete Collection</p>
           <h1 className="text-6xl md:text-7xl leading-tight mb-6" style={{ fontFamily: "var(--font-serif)" }}>
