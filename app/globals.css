@@ -122,14 +122,14 @@
   }
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(220,235,255,0.8) 50%, rgba(240,220,255,0.75) 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #c8e6ff 40%, #e8d4f8 100%);
     background-attachment: fixed;
   }
 }
 
 .marblely-gradient {
-  background: radial-gradient(circle at 20% 50%, rgba(150, 150, 180, 0.12) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(100, 120, 200, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 40% 20%, rgba(200, 200, 220, 0.08) 0%, transparent 40%),
-              linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(245, 240, 255, 0.95) 100%);
+  background: radial-gradient(circle at 20% 50%, rgba(100, 150, 220, 0.35) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(180, 100, 220, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 40% 20%, rgba(150, 180, 255, 0.25) 0%, transparent 40%),
+              linear-gradient(135deg, #fafbff 0%, #f0e8ff 100%);
 }
