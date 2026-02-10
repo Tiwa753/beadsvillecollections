@@ -3,20 +3,7 @@ import Link from "next/link"
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import {
-  Instagram,
-  Paintbrush as Pinterest,
-  ShoppingCart,
-  X,
-  Check,
-  Upload,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Minus,
-  Sparkles,
-  Package,
-} from "lucide-react"
+import { Instagram, Paintbrush as Pinterest, ShoppingCart, X, Check, Upload, ChevronLeft, ChevronRight, Plus, Minus, Sparkles, Package } from "lucide-react"
 import { products as defaultProducts, type Product } from "@/data/products"
 
 interface CartItem extends Product {
@@ -175,11 +162,11 @@ export default function CollectionPage() {
           }}
         >
           <div
-            className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+            className="bg-background rounded-2xl max-w-sm w-full max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Image Slideshow */}
-            <div className="relative aspect-square bg-muted">
+            <div className="relative aspect-square bg-muted flex-shrink-0">
               <img
                 src={selectedProduct.images?.[currentImageIndex] || selectedProduct.image}
                 alt={selectedProduct.name}
@@ -191,24 +178,24 @@ export default function CollectionPage() {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={20} />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={20} />
                   </button>
 
                   {/* Image Indicators */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {selectedProduct.images.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => setCurrentImageIndex(idx)}
-                        className={`w-2 h-2 rounded-full transition-colors ${idx === currentImageIndex ? "bg-white" : "bg-white/50"}`}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === currentImageIndex ? "bg-white" : "bg-white/50"}`}
                       />
                     ))}
                   </div>
@@ -222,47 +209,47 @@ export default function CollectionPage() {
                   setQuantity(1)
                   setCurrentImageIndex(0)
                 }}
-                className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
 
               {/* Discount Badge */}
-              <div className="absolute top-4 left-4 bg-destructive text-white px-3 py-1 text-xs font-bold rounded">
+              <div className="absolute top-3 left-3 bg-destructive text-white px-2 py-1 text-xs font-bold rounded">
                 -20% OFF
               </div>
             </div>
 
-            {/* Product Details */}
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
+            {/* Product Details - Scrollable */}
+            <div className="p-5 overflow-y-auto flex-1">
+              <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
                 {selectedProduct.name}
               </h2>
-              <p className="text-muted-foreground mb-4">{selectedProduct.description}</p>
+              <p className="text-muted-foreground mb-3 text-sm">{selectedProduct.description}</p>
 
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl font-bold">₦{selectedProduct.price.toFixed(0)}</span>
-                <span className="text-lg text-muted-foreground line-through">
+              <div className="flex items-center gap-2 mb-5">
+                <span className="text-2xl font-bold">₦{selectedProduct.price.toFixed(0)}</span>
+                <span className="text-sm text-muted-foreground line-through">
                   ₦{(selectedProduct.originalPrice * 450).toFixed(0)}
                 </span>
               </div>
 
               {/* Quantity Selector */}
-              <div className="flex items-center gap-6 mb-6">
-                <span className="font-semibold">Quantity:</span>
-                <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
+              <div className="flex items-center gap-4 mb-5">
+                <span className="text-sm font-semibold">Qty:</span>
+                <div className="flex items-center gap-2 bg-muted rounded-lg p-0.5">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2 hover:bg-background rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-background rounded transition-colors"
                   >
-                    <Minus size={18} />
+                    <Minus size={16} />
                   </button>
-                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                  <span className="w-10 text-center font-bold text-sm">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 hover:bg-background rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-background rounded transition-colors"
                   >
-                    <Plus size={18} />
+                    <Plus size={16} />
                   </button>
                 </div>
               </div>
@@ -270,10 +257,10 @@ export default function CollectionPage() {
               {/* Add to Cart Button */}
               <button
                 onClick={() => handleAddToCart(selectedProduct, quantity)}
-                className="w-full py-4 bg-primary text-primary-foreground font-bold text-lg hover:bg-opacity-90 transition-all rounded-lg flex items-center justify-center gap-2"
+                className="w-full py-3 bg-primary text-primary-foreground font-bold text-sm hover:bg-opacity-90 transition-all rounded-lg flex items-center justify-center gap-2"
               >
-                <ShoppingCart size={20} />
-                Add {quantity} to Cart — ₦{(selectedProduct.price * quantity).toFixed(0)}
+                <ShoppingCart size={18} />
+                Add to Cart
               </button>
             </div>
           </div>
