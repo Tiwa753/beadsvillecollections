@@ -3,20 +3,7 @@ import Link from "next/link"
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import {
-  Instagram,
-  Paintbrush as Pinterest,
-  ShoppingCart,
-  X,
-  Check,
-  Upload,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Minus,
-  Sparkles,
-  Package,
-} from "lucide-react"
+import { Instagram, Paintbrush as Pinterest, ShoppingCart, X, Check, Upload, ChevronLeft, ChevronRight, Plus, Minus, Sparkles, Package } from "lucide-react"
 import { products as defaultProducts, type Product } from "@/data/products"
 
 interface CartItem extends Product {
@@ -40,6 +27,8 @@ export default function CollectionPage() {
     images: [] as string[],
     imageFiles: [] as File[],
   })
+
+  const [showCart, setShowCart] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem("beadsville_products")
@@ -86,10 +75,7 @@ export default function CollectionPage() {
   }
 
   const scrollToCart = () => {
-    const cartSection = document.getElementById("cart-summary")
-    if (cartSection) {
-      cartSection.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
+    setShowCart(true)
   }
 
   const getTotalItems = () => cart.reduce((sum, item) => sum + item.quantity, 0)
@@ -175,11 +161,11 @@ export default function CollectionPage() {
           }}
         >
           <div
-            className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+            className="bg-background rounded-2xl max-w-sm w-full max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Image Slideshow */}
-            <div className="relative aspect-square bg-muted">
+            <div className="relative aspect-square bg-muted flex-shrink-0">
               <img
                 src={selectedProduct.images?.[currentImageIndex] || selectedProduct.image}
                 alt={selectedProduct.name}
@@ -191,24 +177,24 @@ export default function CollectionPage() {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={20} />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={20} />
                   </button>
 
                   {/* Image Indicators */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {selectedProduct.images.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => setCurrentImageIndex(idx)}
-                        className={`w-2 h-2 rounded-full transition-colors ${idx === currentImageIndex ? "bg-white" : "bg-white/50"}`}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === currentImageIndex ? "bg-white" : "bg-white/50"}`}
                       />
                     ))}
                   </div>
@@ -222,47 +208,47 @@ export default function CollectionPage() {
                   setQuantity(1)
                   setCurrentImageIndex(0)
                 }}
-                className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
 
               {/* Discount Badge */}
-              <div className="absolute top-4 left-4 bg-destructive text-white px-3 py-1 text-xs font-bold rounded">
+              <div className="absolute top-3 left-3 bg-destructive text-white px-2 py-1 text-xs font-bold rounded">
                 -20% OFF
               </div>
             </div>
 
-            {/* Product Details */}
-            <div className="p-6">
-              <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
+            {/* Product Details - Scrollable */}
+            <div className="p-5 overflow-y-auto flex-1">
+              <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--font-serif)" }}>
                 {selectedProduct.name}
               </h2>
-              <p className="text-muted-foreground mb-4">{selectedProduct.description}</p>
+              <p className="text-muted-foreground mb-3 text-sm">{selectedProduct.description}</p>
 
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl font-bold">₦{selectedProduct.price.toFixed(0)}</span>
-                <span className="text-lg text-muted-foreground line-through">
+              <div className="flex items-center gap-2 mb-5">
+                <span className="text-2xl font-bold">₦{selectedProduct.price.toFixed(0)}</span>
+                <span className="text-sm text-muted-foreground line-through">
                   ₦{(selectedProduct.originalPrice * 450).toFixed(0)}
                 </span>
               </div>
 
               {/* Quantity Selector */}
-              <div className="flex items-center gap-6 mb-6">
-                <span className="font-semibold">Quantity:</span>
-                <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
+              <div className="flex items-center gap-4 mb-5">
+                <span className="text-sm font-semibold">Qty:</span>
+                <div className="flex items-center gap-2 bg-muted rounded-lg p-0.5">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2 hover:bg-background rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-background rounded transition-colors"
                   >
-                    <Minus size={18} />
+                    <Minus size={16} />
                   </button>
-                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                  <span className="w-10 text-center font-bold text-sm">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 hover:bg-background rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-background rounded transition-colors"
                   >
-                    <Plus size={18} />
+                    <Plus size={16} />
                   </button>
                 </div>
               </div>
@@ -270,10 +256,10 @@ export default function CollectionPage() {
               {/* Add to Cart Button */}
               <button
                 onClick={() => handleAddToCart(selectedProduct, quantity)}
-                className="w-full py-4 bg-primary text-primary-foreground font-bold text-lg hover:bg-opacity-90 transition-all rounded-lg flex items-center justify-center gap-2"
+                className="w-full py-3 bg-primary text-primary-foreground font-bold text-sm hover:bg-opacity-90 transition-all rounded-lg flex items-center justify-center gap-2"
               >
-                <ShoppingCart size={20} />
-                Add {quantity} to Cart — ₦{(selectedProduct.price * quantity).toFixed(0)}
+                <ShoppingCart size={18} />
+                Add to Cart
               </button>
             </div>
           </div>
@@ -319,7 +305,7 @@ export default function CollectionPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 marblely-gradient rounded-2xl my-8">
         <div className="text-center">
           <p className="text-sm tracking-widest text-muted-foreground uppercase mb-4">Complete Collection</p>
           <h1 className="text-6xl md:text-7xl leading-tight mb-6" style={{ fontFamily: "var(--font-serif)" }}>
@@ -488,11 +474,18 @@ export default function CollectionPage() {
         </div>
       </section>
 
-      {cart.length > 0 && (
-        <section id="cart-summary" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-gradient-to-br from-muted to-muted/50 rounded-2xl overflow-hidden shadow-xl border border-border">
+      {/* Cart Modal */}
+      {showCart && (
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowCart(false)}
+        >
+          <div
+            className="bg-background rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Cart Header */}
-            <div className="bg-primary text-primary-foreground p-6">
+            <div className="bg-primary text-primary-foreground p-6 sticky top-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="bg-white/20 p-3 rounded-full">
@@ -507,101 +500,114 @@ export default function CollectionPage() {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm opacity-90">Total</p>
-                  <p className="text-3xl font-bold">₦{getTotalPrice().toFixed(0)}</p>
-                </div>
+                <button
+                  onClick={() => setShowCart(false)}
+                  className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
               </div>
             </div>
 
-            {/* Cart Items */}
-            <div className="p-6 space-y-4">
-              {cart.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-background rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  {/* Product Image */}
-                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Product Details */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-lg truncate" style={{ fontFamily: "var(--font-serif)" }}>
-                      {item.name}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">₦{item.price.toFixed(0)} each</p>
-                  </div>
-
-                  {/* Quantity Controls */}
-                  <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
-                    <button
-                      onClick={() => updateCartQuantity(idx, item.quantity - 1)}
-                      className="p-2 hover:bg-background rounded transition-colors"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <span className="w-8 text-center font-bold">{item.quantity}</span>
-                    <button
-                      onClick={() => updateCartQuantity(idx, item.quantity + 1)}
-                      className="p-2 hover:bg-background rounded transition-colors"
-                    >
-                      <Plus size={16} />
-                    </button>
-                  </div>
-
-                  {/* Item Total */}
-                  <div className="text-right w-24">
-                    <p className="font-bold text-lg">₦{(item.price * item.quantity).toFixed(0)}</p>
-                  </div>
-
-                  {/* Remove Button */}
+            {/* Cart Items or Empty State */}
+            <div className="p-6">
+              {cart.length === 0 ? (
+                <div className="text-center py-16">
+                  <ShoppingCart size={64} className="mx-auto text-muted-foreground mb-4 opacity-50" />
+                  <h4 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-serif)" }}>
+                    Your cart is empty
+                  </h4>
+                  <p className="text-lg text-muted-foreground mb-8">
+                    <span className="font-light tracking-wide">Shop BEADSVILLE and</span>
+                    <br />
+                    <span className="text-2xl font-serif italic text-foreground bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
+                      look especial
+                    </span>
+                  </p>
                   <button
-                    onClick={() => removeFromCart(idx)}
-                    className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors"
+                    onClick={() => setShowCart(false)}
+                    className="px-8 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all font-semibold rounded-lg"
                   >
-                    <X size={20} />
+                    Continue Shopping
                   </button>
                 </div>
-              ))}
-            </div>
+              ) : (
+                <div className="space-y-4">
+                  {cart.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-muted rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      {/* Product Image */}
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-background">
+                        <img
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-            {/* Cart Footer */}
-            <div className="border-t border-border p-6 bg-background/50">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    
-                    
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={18} />
-                    <span>Gift wrapping available</span>
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-lg truncate" style={{ fontFamily: "var(--font-serif)" }}>
+                          {item.name}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">₦{item.price.toFixed(0)} each</p>
+                      </div>
+
+                      {/* Quantity Controls */}
+                      <div className="flex items-center gap-2 bg-background rounded-lg p-1">
+                        <button
+                          onClick={() => updateCartQuantity(idx, item.quantity - 1)}
+                          className="p-2 hover:bg-muted rounded transition-colors"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-8 text-center font-bold">{item.quantity}</span>
+                        <button
+                          onClick={() => updateCartQuantity(idx, item.quantity + 1)}
+                          className="p-2 hover:bg-muted rounded transition-colors"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+
+                      {/* Item Total */}
+                      <div className="text-right w-24">
+                        <p className="font-bold text-lg">₦{(item.price * item.quantity).toFixed(0)}</p>
+                      </div>
+
+                      {/* Remove Button */}
+                      <button
+                        onClick={() => removeFromCart(idx)}
+                        className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Cart Footer */}
+                  <div className="border-t border-border pt-6 mt-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <p className="text-2xl font-bold">₦{getTotalPrice().toFixed(0)}</p>
+                    </div>
+                    <button
+                      onClick={handleCheckout}
+                      className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                      </svg>
+                      Complete Order on WhatsApp
+                    </button>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Subtotal</p>
-                  <p className="text-2xl font-bold">₦{getTotalPrice().toFixed(0)}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={handleCheckout}
-                className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
-              >
-                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                </svg>
-                Complete Order on WhatsApp
-              </button>
+              )}
             </div>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Back to Home */}
