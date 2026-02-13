@@ -367,7 +367,7 @@ export default function CollectionPage() {
               <div className="flex items-center gap-2 mb-4">
                 <p className="font-bold">₦{product.price.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground line-through">
-                  ₦{(product.originalPrice * 450).toFixed(0)}
+                  ₦{(product.originalPrice * 1).toFixed(0)}
                 </p>
               </div>
               <button
