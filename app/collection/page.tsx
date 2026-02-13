@@ -31,14 +31,33 @@ export default function CollectionPage() {
   const [showCart, setShowCart] = useState(false)
 
   useEffect(() => {
+    let productsToUse = defaultProducts
+    
+    // Load custom products if they exist
     const saved = localStorage.getItem("beadsville_products")
     if (saved) {
       try {
-        setAllProducts(JSON.parse(saved))
+        productsToUse = JSON.parse(saved)
       } catch (e) {
-        setAllProducts(defaultProducts)
+        productsToUse = defaultProducts
       }
     }
+
+    // Load updated prices
+    const savedPrices = localStorage.getItem("beadsville_product_prices")
+    if (savedPrices) {
+      try {
+        const prices = JSON.parse(savedPrices)
+        productsToUse = productsToUse.map(p => ({
+          ...p,
+          price: prices[p.id] !== undefined ? prices[p.id] : p.price
+        }))
+      } catch (e) {
+        console.error("Error loading prices:", e)
+      }
+    }
+
+    setAllProducts(productsToUse)
   }, [])
 
   const filteredProducts = filter === "all" ? allProducts : allProducts.filter((p) => p.category === filter)
@@ -367,7 +386,7 @@ export default function CollectionPage() {
               <div className="flex items-center gap-2 mb-4">
                 <p className="font-bold">₦{product.price.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground line-through">
-                  ₦{(product.originalPrice * 450).toFixed(0)}
+                  ₦{(product.originalPrice * 1).toFixed(0)}
                 </p>
               </div>
               <button

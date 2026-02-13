@@ -9,19 +9,7 @@ export default function Home() {
   const [reviews, setReviews] = useState<Review[]>(defaultReviews)
   const [cart, setCart] = useState([])
   const [showCart, setShowCart] = useState(false)
-
-  useEffect(() => {
-    const saved = localStorage.getItem("beadsville_reviews")
-    if (saved) {
-      try {
-        setReviews(JSON.parse(saved))
-      } catch (e) {
-        setReviews(defaultReviews)
-      }
-    }
-  }, [])
-
-  const featuredProducts = [
+  const [featuredProducts, setFeaturedProducts] = useState([
     {
       id: 1,
       name: "Ruby Heart Necklace",
@@ -46,7 +34,32 @@ export default function Home() {
       originalPrice: 61.24,
       description: "Ethereal gold chain with colorful enamel charms",
     },
-  ]
+  ])
+
+  useEffect(() => {
+    const saved = localStorage.getItem("beadsville_reviews")
+    if (saved) {
+      try {
+        setReviews(JSON.parse(saved))
+      } catch (e) {
+        setReviews(defaultReviews)
+      }
+    }
+
+    // Load updated prices
+    const savedPrices = localStorage.getItem("beadsville_product_prices")
+    if (savedPrices) {
+      try {
+        const prices = JSON.parse(savedPrices)
+        setFeaturedProducts(prev => prev.map(p => ({
+          ...p,
+          price: prices[p.id] !== undefined ? prices[p.id] : p.price
+        })))
+      } catch (e) {
+        console.error("Error loading prices:", e)
+      }
+    }
+  }, [])
 
   const handleAddToCart = (product) => {
     setCart([...cart, product])
@@ -327,7 +340,7 @@ export default function Home() {
             <div className="order-1 md:order-2 flex justify-center">
               <div className="w-72 h-72 md:w-80 md:h-80 rounded-lg overflow-hidden shadow-lg">
                 <img
-                  src="/images/img-20251214-wa0044.jpg"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20251214-WA0044-AF14G4Guj6o67pVzz5ZP5QvtXcuwCl.jpg"
                   alt="BEADSVILLE Workshop - Where the magic happens"
                   className="w-full h-full object-cover"
                 />
