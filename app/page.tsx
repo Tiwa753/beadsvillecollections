@@ -9,19 +9,7 @@ export default function Home() {
   const [reviews, setReviews] = useState<Review[]>(defaultReviews)
   const [cart, setCart] = useState([])
   const [showCart, setShowCart] = useState(false)
-
-  useEffect(() => {
-    const saved = localStorage.getItem("beadsville_reviews")
-    if (saved) {
-      try {
-        setReviews(JSON.parse(saved))
-      } catch (e) {
-        setReviews(defaultReviews)
-      }
-    }
-  }, [])
-
-  const featuredProducts = [
+  const [featuredProducts, setFeaturedProducts] = useState([
     {
       id: 1,
       name: "Ruby Heart Necklace",
@@ -46,7 +34,32 @@ export default function Home() {
       originalPrice: 61.24,
       description: "Ethereal gold chain with colorful enamel charms",
     },
-  ]
+  ])
+
+  useEffect(() => {
+    const saved = localStorage.getItem("beadsville_reviews")
+    if (saved) {
+      try {
+        setReviews(JSON.parse(saved))
+      } catch (e) {
+        setReviews(defaultReviews)
+      }
+    }
+
+    // Load updated prices
+    const savedPrices = localStorage.getItem("beadsville_product_prices")
+    if (savedPrices) {
+      try {
+        const prices = JSON.parse(savedPrices)
+        setFeaturedProducts(prev => prev.map(p => ({
+          ...p,
+          price: prices[p.id] !== undefined ? prices[p.id] : p.price
+        })))
+      } catch (e) {
+        console.error("Error loading prices:", e)
+      }
+    }
+  }, [])
 
   const handleAddToCart = (product) => {
     setCart([...cart, product])
