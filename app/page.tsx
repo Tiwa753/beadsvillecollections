@@ -75,8 +75,8 @@ export default function Home() {
 
   const handleCheckout = () => {
     if (cart.length === 0) return
-    const cartSummary = cart.map((p) => `${p.name} - ₦${(p.price * 450).toFixed(0)}`).join("%0A")
-    const message = `Hi! I'd like to order:%0A${cartSummary}%0A%0ATotal: ₦${(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}`
+  const cartSummary = cart.map((p) => `${p.name} - ₦${p.price.toFixed(0)}`).join("%0A")
+  const message = `Hi! I'd like to order:%0A${cartSummary}%0A%0ATotal: ₦${(cart.reduce((sum, p) => sum + p.price, 0)).toFixed(0)}`
     window.open(`https://wa.me/2349067480528?text=${message}`, "_blank")
   }
 
@@ -165,9 +165,9 @@ export default function Home() {
               </h3>
               <p className="text-muted-foreground mb-4 text-sm">{product.description}</p>
               <div className="flex items-center gap-3 mb-6">
-                <p className="text-xl font-bold">₦{(product.price * 450).toFixed(0)}</p>
+                <p className="text-xl font-bold">₦{product.price.toFixed(0)}</p>
                 <p className="text-sm text-muted-foreground line-through">
-                  ₦{(product.originalPrice * 450).toFixed(0)}
+                  ₦{(product.originalPrice).toFixed(0)}
                 </p>
               </div>
               <button
@@ -281,7 +281,7 @@ export default function Home() {
                         <h4 className="font-semibold text-lg" style={{ fontFamily: "var(--font-serif)" }}>
                           {item.name}
                         </h4>
-                        <p className="text-sm text-muted-foreground">₦{(item.price * 450).toFixed(0)}</p>
+                        <p className="text-sm text-muted-foreground">₦{item.price.toFixed(0)}</p>
                       </div>
 
                       <button
@@ -297,7 +297,7 @@ export default function Home() {
                   <div className="border-t border-border pt-6 mt-6 space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Total</span>
-                      <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0) * 450).toFixed(0)}</p>
+                      <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0)).toFixed(0)}</p>
                     </div>
                     <button
                       onClick={handleCheckout}
