@@ -1,40 +1,20 @@
 "use client"
 
-import { Star, Instagram, Paintbrush as Pinterest, ShoppingCart, X } from "lucide-react"
+import { Star, Instagram, Paintbrush as Pinterest, ShoppingCart, X, Loader } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { reviews as defaultReviews, type Review } from "@/data/products"
+import { subscribeToProducts } from "@/lib/firebase-service"
+import { createCheckoutSession } from "@/lib/stripe-service"
 
 export default function Home() {
   const [reviews, setReviews] = useState<Review[]>(defaultReviews)
   const [cart, setCart] = useState([])
   const [showCart, setShowCart] = useState(false)
-  const [featuredProducts, setFeaturedProducts] = useState([
-    {
-      id: 1,
-      name: "Ruby Heart Necklace",
-      image: "/images/img-20251210-wa0015.jpg",
-      price: 45.99,
-      originalPrice: 57.49,
-      description: "Romantic silver chain with striking red heart pendant",
-    },
-    {
-      id: 2,
-      name: "Garden Bloom Necklace",
-      image: "/images/img-20251210-wa0021.jpg",
-      price: 42.5,
-      originalPrice: 53.13,
-      description: "Vibrant gold chain with mixed gemstone beads",
-    },
-    {
-      id: 3,
-      name: "Celestial Dreams Necklace",
-      image: "/images/img-20251210-wa0025.jpg",
-      price: 48.99,
-      originalPrice: 61.24,
-      description: "Ethereal gold chain with colorful enamel charms",
-    },
-  ])
+  const [currency, setCurrency] = useState("NGN")
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [featuredProducts, setFeaturedProducts] = useState([])
+  const [loadingProducts, setLoadingProducts] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem("beadsville_reviews")
@@ -46,19 +26,14 @@ export default function Home() {
       }
     }
 
-    // Load updated prices
-    const savedPrices = localStorage.getItem("beadsville_product_prices")
-    if (savedPrices) {
-      try {
-        const prices = JSON.parse(savedPrices)
-        setFeaturedProducts(prev => prev.map(p => ({
-          ...p,
-          price: prices[p.id] !== undefined ? prices[p.id] : p.price
-        })))
-      } catch (e) {
-        console.error("Error loading prices:", e)
-      }
-    }
+    // Subscribe to Firebase products in real-time
+    const unsubscribe = subscribeToProducts((products) => {
+      // Get only first 3 for featured section
+      setFeaturedProducts(products.slice(0, 3))
+      setLoadingProducts(false)
+    })
+
+    return () => unsubscribe()
   }, [])
 
   const handleAddToCart = (product) => {
@@ -73,11 +48,28 @@ export default function Home() {
     setShowCart(true)
   }
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return
-  const cartSummary = cart.map((p) => `${p.name} - ₦${p.price.toFixed(0)}`).join("%0A")
-  const message = `Hi! I'd like to order:%0A${cartSummary}%0A%0ATotal: ₦${(cart.reduce((sum, p) => sum + p.price, 0)).toFixed(0)}`
-    window.open(`https://wa.me/2349067480528?text=${message}`, "_blank")
+    setIsCheckingOut(true)
+    try {
+      const checkoutItems = cart.map(item => ({
+        id: item.id || item.name,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+        currency: currency
+      }))
+      
+      const { url } = await createCheckoutSession(checkoutItems, currency)
+      if (url) {
+        window.location.href = url
+      }
+    } catch (error) {
+      console.error("Checkout failed:", error)
+      alert("Checkout failed. Please try again.")
+    } finally {
+      setIsCheckingOut(false)
+    }
   }
 
   return (
@@ -295,18 +287,39 @@ export default function Home() {
 
                   {/* Cart Footer */}
                   <div className="border-t border-border pt-6 mt-6 space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold mb-2 block">Currency</label>
+                      <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+                      >
+                        <option value="NGN">Nigerian Naira (₦)</option>
+                        <option value="USD">US Dollar ($)</option>
+                        <option value="EUR">Euro (€)</option>
+                        <option value="GBP">British Pound (£)</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center justify-between mb-4">
                       <span className="text-muted-foreground">Total</span>
-                      <p className="text-2xl font-bold">₦{(cart.reduce((sum, p) => sum + p.price, 0)).toFixed(0)}</p>
+                      <p className="text-2xl font-bold">{currency === "NGN" ? "₦" : currency === "USD" ? "$" : currency === "EUR" ? "€" : "£"}{(cart.reduce((sum, p) => sum + p.price, 0)).toFixed(2)}</p>
                     </div>
                     <button
                       onClick={handleCheckout}
-                      className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                      disabled={isCheckingOut}
+                      className="w-full py-4 bg-primary hover:bg-opacity-90 disabled:opacity-50 text-primary-foreground font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                     >
-                      <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                      </svg>
-                      Complete Order on WhatsApp
+                      {isCheckingOut ? (
+                        <>
+                          <Loader size={20} className="animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingCart size={20} />
+                          Pay Securely with Stripe
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
