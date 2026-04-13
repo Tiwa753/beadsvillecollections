@@ -116,9 +116,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="text-white text-center py-3 bg-destructive">
-        <p className="text-sm font-semibold tracking-wide">EXCLUSIVE: 20% OFF ALL PIECES - CHRISTMAS EDITION</p>
-      </div>
+      
 
       <section className="relative w-full h-[70vh] min-h-[500px] overflow-hidden">
         <img
